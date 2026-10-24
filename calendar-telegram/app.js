@@ -1,6 +1,7 @@
 const tg = window.Telegram.WebApp;
 
-// Expande la Mini App para usar la pantalla completa
+// 1. Inicialización obligatoria de Telegram WebApp
+tg.ready();
 tg.expand();
 
 let currentDate = new Date();
@@ -20,19 +21,16 @@ function renderCalendar() {
   const grid = document.getElementById('days-grid');
   grid.innerHTML = '';
 
-  // Ajustar el índice para que Lunes sea el primer día (0: Lun, 6: Dom)
   const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
   const totalDays = new Date(year, month + 1, 0).getDate();
   const today = new Date();
 
-  // Rellenar espacios vacíos al inicio del mes
   for (let i = 0; i < firstDayIndex; i++) {
     const emptyDiv = document.createElement('div');
     emptyDiv.classList.add('day', 'empty');
     grid.appendChild(emptyDiv);
   }
 
-  // Días del mes
   for (let day = 1; day <= totalDays; day++) {
     const dayDiv = document.createElement('div');
     dayDiv.classList.add('day');
@@ -41,7 +39,6 @@ function renderCalendar() {
     const thisDate = new Date(year, month, day);
     const dateFormatted = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    // Marcar si es el día de hoy
     if (
       day === today.getDate() &&
       month === today.getMonth() &&
@@ -50,19 +47,18 @@ function renderCalendar() {
       dayDiv.classList.add('today');
     }
 
-    // Deshabilitar fechas pasadas (opcional)
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     if (thisDate < startOfToday) {
       dayDiv.classList.add('disabled');
     } else {
-      // Evento de selección
       dayDiv.addEventListener('click', () => {
         document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
         dayDiv.classList.add('selected');
         selectedDateStr = dateFormatted;
 
-        // Configurar y mostrar el MainButton nativo de Telegram abajo
+        // Configurar, activar y mostrar el MainButton nativo
         tg.MainButton.setText(`Confirmar fecha: ${selectedDateStr}`);
+        tg.MainButton.enable();
         tg.MainButton.show();
       });
     }
@@ -71,7 +67,6 @@ function renderCalendar() {
   }
 }
 
-// Navegación de meses
 document.getElementById('prev-month').addEventListener('click', () => {
   currentDate.setMonth(currentDate.getMonth() - 1);
   renderCalendar();
@@ -82,7 +77,6 @@ document.getElementById('next-month').addEventListener('click', () => {
   renderCalendar();
 });
 
-// Acción al presionar el botón de enviar en Telegram
 tg.MainButton.onClick(() => {
   if (selectedDateStr) {
     const payload = JSON.stringify({
@@ -90,7 +84,7 @@ tg.MainButton.onClick(() => {
       date: selectedDateStr
     });
     
-    alert("Intentando enviar: " + payload); // <--- Esto te dirá si el botón realmente reaccionó al clic
+    alert("Intentando enviar: " + payload);
     tg.sendData(payload); 
   } else {
     alert("No hay fecha seleccionada");
