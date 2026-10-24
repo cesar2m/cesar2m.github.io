@@ -89,7 +89,11 @@ tg.MainButton.onClick(() => {
       action: "select_date",
       date: selectedDateStr
     });
-    tg.sendData(payload); // Envía los datos al bot Java y cierra la Mini App
+    
+    alert("Intentando enviar: " + payload); // <--- Esto te dirá si el botón realmente reaccionó al clic
+    tg.sendData(payload); 
+  } else {
+    alert("No hay fecha seleccionada");
   }
 });
 
