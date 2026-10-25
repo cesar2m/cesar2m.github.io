@@ -51,12 +51,15 @@ function renderCalendar() {
     if (thisDate < startOfToday) {
       dayDiv.classList.add('disabled');
     } else {
+      // Evento al hacer clic en un día válido
       dayDiv.addEventListener('click', () => {
         document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
         dayDiv.classList.add('selected');
+        
+        // 1. Guardar la fecha seleccionada
         selectedDateStr = dateFormatted;
 
-        // Configurar, activar y mostrar el MainButton nativo
+        // 2. Configurar, activar y mostrar el MainButton nativo
         tg.MainButton.setText(`Confirmar fecha: ${selectedDateStr}`);
         tg.MainButton.enable();
         tg.MainButton.show();
@@ -67,6 +70,7 @@ function renderCalendar() {
   }
 }
 
+// Navegación de meses
 document.getElementById('prev-month').addEventListener('click', () => {
   currentDate.setMonth(currentDate.getMonth() - 1);
   renderCalendar();
@@ -77,15 +81,33 @@ document.getElementById('next-month').addEventListener('click', () => {
   renderCalendar();
 });
 
+// Acción del botón principal de Telegram (Declarado FUERA, una sola vez)
 tg.MainButton.onClick(() => {
   if (selectedDateStr) {
-    const payload = JSON.stringify({
-      action: "select_date",
+    const payload = {
+      initData: tg.initData, // Vital para la seguridad en tu backend
       date: selectedDateStr
-    });
+    };
     
-    alert("Intentando enviar: " + payload);
-    tg.sendData(payload); 
+    // Petición HTTP POST hacia tu Spring Boot
+    fetch('https://rippling-haphazard-tweet.ngrok-free.dev/api/v1/chatbot/business/guardar-fecha', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => {
+      if (response.ok) {
+        tg.close(); // Cierra la Mini App al completarse con éxito
+      } else {
+        alert("Hubo un error al guardar la fecha en el servidor.");
+      }
+    })
+    .catch(error => {
+      console.error("Error de red:", error);
+      alert("No se pudo conectar con el servidor.");
+    });
   } else {
     alert("No hay fecha seleccionada");
   }
