@@ -1,8 +1,11 @@
 const tg = window.Telegram.WebApp;
 
-// 1. Inicialización obligatoria de Telegram WebApp
 tg.ready();
 tg.expand();
+
+// 1. Leer el parámetro de la URL para saber qué método usar
+const urlParams = new URLSearchParams(window.location.search);
+const origin = urlParams.get('origin'); // Valdrá 'inline' o 'reply'
 
 let currentDate = new Date();
 let selectedDateStr = null;
@@ -51,16 +54,14 @@ function renderCalendar() {
     if (thisDate < startOfToday) {
       dayDiv.classList.add('disabled');
     } else {
-      // Evento al hacer clic en un día válido
       dayDiv.addEventListener('click', () => {
         document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
         dayDiv.classList.add('selected');
         
-        // 1. Guardar la fecha seleccionada
         selectedDateStr = dateFormatted;
 
-        // 2. Configurar, activar y mostrar el MainButton nativo
-        tg.MainButton.setText(`Confirmar fecha: ${selectedDateStr}`);
+        // Mostrar texto dinámico según el origen para depurar visualmente
+        tg.MainButton.setText(`Confirmar (${origin}): ${selectedDateStr}`);
         tg.MainButton.enable();
         tg.MainButton.show();
       });
@@ -81,35 +82,50 @@ document.getElementById('next-month').addEventListener('click', () => {
   renderCalendar();
 });
 
-// Acción del botón principal de Telegram (Declarado FUERA, una sola vez)
+// Acción centralizada del MainButton
 tg.MainButton.onClick(() => {
-  if (selectedDateStr) {
+  if (!selectedDateStr) {
+    alert("No hay fecha seleccionada");
+    return;
+  }
+
+  if (origin === 'inline') {
+    // ----------------------------------------------------
+    // MÉTODO 1: Petición HTTP POST vía Fetch hacia Ngrok
+    // ----------------------------------------------------
     const payload = {
-      initData: tg.initData, // Vital para la seguridad en tu backend
+      initData: tg.initData,
       date: selectedDateStr
     };
     
-    // Petición HTTP POST hacia tu Spring Boot
     fetch('https://rippling-haphazard-tweet.ngrok-free.dev/api/v1/chatbot/business/guardar-fecha', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
     .then(response => {
       if (response.ok) {
-        tg.close(); // Cierra la Mini App al completarse con éxito
+        tg.close();
       } else {
-        alert("Hubo un error al guardar la fecha en el servidor.");
+        alert("Error al guardar en el servidor local.");
       }
     })
     .catch(error => {
       console.error("Error de red:", error);
-      alert("No se pudo conectar con el servidor.");
+      alert("No se pudo conectar con Ngrok.");
     });
+
   } else {
-    alert("No hay fecha seleccionada");
+    // ----------------------------------------------------
+    // MÉTODO 2: Envío Nativo con tg.sendData() (Reply Keyboard)
+    // ----------------------------------------------------
+    const payload = JSON.stringify({
+      action: "select_date",
+      date: selectedDateStr
+    });
+    
+    // Como este botón se abrió desde el teclado inferior, Telegram SÍ procesará esto
+    tg.sendData(payload); 
   }
 });
 
