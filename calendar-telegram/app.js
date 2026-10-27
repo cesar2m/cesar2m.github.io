@@ -91,7 +91,7 @@ tg.MainButton.onClick(() => {
 
   if (origin === 'inline') {
     // ----------------------------------------------------
-    // MÉTODO 1: Petición HTTP POST vía Fetch hacia Ngrok
+    // FLUJO 1: Botón Inline -> Petición HTTP POST vía Fetch (Ngrok)
     // ----------------------------------------------------
     const payload = {
       initData: tg.initData,
@@ -117,14 +117,15 @@ tg.MainButton.onClick(() => {
 
   } else {
     // ----------------------------------------------------
-    // MÉTODO 2: Envío Nativo con tg.sendData() (Reply Keyboard)
+    // FLUJO 2: Teclado Inferior (Reply) -> Envío Nativo a Telegram
     // ----------------------------------------------------
     const payload = JSON.stringify({
       action: "select_date",
       date: selectedDateStr
     });
     
-    // Como este botón se abrió desde el teclado inferior, Telegram SÍ procesará esto
+    // AQUÍ ESTÁ LA MAGIA: Esto le dice a Telegram que envíe el WebAppData 
+    // a sus servidores para que llegue a tu bot mediante el Webhook / Long Polling.
     tg.sendData(payload); 
   }
 });
