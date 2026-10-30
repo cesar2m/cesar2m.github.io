@@ -1,5 +1,5 @@
 // URL base de tu backend en Heroku (cámbiala por tu endpoint real si es diferente)
-const API_BASE_URL = "https://rippling-haphazard-tweet.ngrok-free.dev/api/v1/chatbot/gallery"; // Ajusta según tu ruta
+const API_BASE_URL = "https://rippling-haphazard-tweet.ngrok-free.dev/api/v1/chatbot/imageGallery";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Capturar parámetros de la URL (ej: ?botUsername=test&optionId=5)
@@ -15,18 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
     setupViewToggle();
 });
 
-async function fetchDataAndRender(botUsername, optionId, userId) {
+async function fetchDataAndRender(botUsername, optionId) {
     try {
-        // Petición al backend que mapea a tu ImagenGalleryDTO
-        const response = await fetch(`${API_BASE_URL}?optionId=${optionId}&botUsername=${botUsername}&userId=${userId}`);
+        // Concatenamos la URL base con los parámetros exactos que espera tu @RequestParam
+        const response = await fetch(`${API_BASE_URL}?botUserName=${botUsername}&optionId=${optionId}`);
         
         if (!response.ok) {
-            throw new Error("Error al obtener los datos de la galería");
+            throw new Error("No se encontró la galería o hubo un error en el servidor");
         }
 
         const data = await response.json(); 
-        // Estructura esperada de 'data' (ImagenGalleryDTO):
-        // { idCloudBusines, idUser, optionMenuId, titulo, mensaje, urls: [...] }
 
         renderHeader(data.titulo, data.mensaje);
         renderCarousel(data.urls);
