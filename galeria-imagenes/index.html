@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Imágenes</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome para iconos (opcional, para las flechas del carrusel) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Encabezado dinámico proveniente del DTO (titulo y mensaje) -->
+        <header id="gallery-header" class="gallery-header">
+            <h1 id="gallery-title">Cargando título...</h1>
+            <p id="gallery-message">Por favor espera un momento.</p>
+        </header>
+
+        <!-- Botón para alternar vistas (Carrusel / Mosaico) -->
+        <!-- Interruptor para alternar vistas (Carrusel / Mosaico) -->
+<div class="view-toggle-wrapper">
+    <span class="toggle-label">Carrusel</span>
+    <label class="switch">
+        <input type="checkbox" id="viewToggleSwitch">
+        <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Mosaico</span>
+</div>
+
+        <!-- Sección de Carrusel -->
+        <section id="carousel-section" class="view-section active">
+            <div class="carousel-container">
+                <button class="carousel-btn prev-btn" id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-track-container">
+                    <ul class="carousel-track" id="carouselTrack">
+                        <!-- Las imágenes se inyectan dinámicamente con JS -->
+                    </ul>
+                </div>
+                <button class="carousel-btn next-btn" id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="carousel-indicators" id="carouselIndicators"></div>
+        </section>
+
+        <!-- Sección de Mosaico (Grid) -->
+        <section id="grid-section" class="view-section">
+            <div class="image-grid" id="imageGrid">
+                <!-- Las imágenes se inyectan dinámicamente con JS -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal para ver imagen ampliada -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
