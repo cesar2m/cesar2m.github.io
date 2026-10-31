@@ -28,13 +28,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function fetchDataAndRender(botUserName, optionId) {
-    // Construimos la URL exacta con los parámetros que exige tu @RequestParam en Java
     const targetUrl = `${API_BASE_URL}?botUserName=${encodeURIComponent(botUserName)}&optionId=${encodeURIComponent(optionId)}`;
     
     console.log("--> Disparando petición FETCH a:", targetUrl);
 
     try {
-        const response = await fetch(targetUrl);
+        // Agregamos el objeto 'headers' para saltarnos la advertencia de ngrok de forma automática
+        const response = await fetch(targetUrl, {
+            method: 'GET',
+            headers: {
+                'ngrok-skip-browser-warning': 'true',
+                'User-Agent': 'TelegramMiniApp'
+            }
+        });
         
         console.log("<- Respuesta del servidor recibida. Status:", response.status, response.statusText);
 
@@ -47,19 +53,13 @@ async function fetchDataAndRender(botUserName, optionId) {
         const data = await response.json(); 
         console.log("✅ DTO recibido exitosamente del backend:", data);
 
-        // Renderizar elementos en pantalla
         renderHeader(data.titulo, data.mensaje);
         renderCarousel(data.urls);
         renderGrid(data.urls);
 
     } catch (error) {
         console.error("❌ EXCEPCIÓN EN LA PETICIÓN FETCH:", error);
-        
-        // Alerta visible en pantalla para identificar el problema de inmediato en el móvil
-        alert("No se pudo conectar con el backend.\nDetalle: " + error.message + "\n\nVerifica que ngrok esté activo y hayas aceptado la advertencia en el navegador del celular.");
-
-        document.getElementById("gallery-title").textContent = "Sin conexión al servidor";
-        document.getElementById("gallery-message").textContent = "Revisa la consola o asegúrate de que ngrok esté corriendo.";
+        alert("No se pudo conectar con el backend.\nDetalle: " + error.message);
     }
 }
 
