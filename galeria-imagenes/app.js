@@ -1,5 +1,5 @@
 // URL base de tu backend a través de Ngrok
-const API_BASE_URL = "https://rippling-haphazard-tweet.ngrok-free.dev/api/v1/chatbot/imageGallery";
+const API_BASE_URL = "https://rippling-haphazard-tweet.ngrok-free.dev/api/v1/chatbot/optionMenuImage/imageGallery";
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("=== INICIANDO MINI APP DE GALERÍA ===");
